@@ -3,7 +3,7 @@ const database = require('./datbase')
 var _ = require('lodash');
 
 function printHeader() {
-    console.log(`***<没钱赚商店>购物清单***\n`);
+    return `***<没钱赚商店>购物清单***\n`;
 }
 
 function generateItemObj(itemObj, barcode) {
@@ -11,25 +11,34 @@ function generateItemObj(itemObj, barcode) {
 }
 
 function printItem(itemObj) {
-    return `名称：${itemObj.name}，数量：${itemObj.count}${itemObj.unit}，单价：${itemObj.price.toFixed(2)}(元)，小计：${itemObj.subtotal}(元)\n`
+    return `名称：${itemObj.name}，数量：${itemObj.count}${itemObj.unit}，单价：${itemObj.price.toFixed(2)}(元)，小计：${itemObj.subtotal.toFixed(2)}(元)\n`
 }
 
-function printPromotion() {
-    return "挥泪赠送商品：\n" +
-        "    名称：雪碧，数量：1瓶\n" +
-        "    名称：方便面，数量：1袋\n";
+function printPromotionHeader() {
+    return "挥泪赠送商品：\n";
 }
 
+function printPromotionItem(itemObj) {
+    return `名称：${itemObj.name}，数量：${itemObj.promotedCount}${itemObj.unit}\n`;
+}
 function printLineBreak() {
     return `----------------------\n`;
 }
-function printTotal() {
-    return `总计：(元)\n**********************`;
+function printTotal(summary) {
+    return `总计：${summary.total.toFixed(2)}(元)\n节省：${summary.savedTotal.toFixed(2)}(元)\n**********************`;
 }
 
 function main() {
     return 'Hello World!';
 };
+
+function calculateTotal(itemsInCart) {
+    return _.reduce(itemsInCart, function(acc, item) {
+        acc.total += item.subtotal;
+        acc.savedTotal += item.price * item.promotedCount || 0;
+        return acc;
+    }, { total: 0, savedTotal: 0});
+}
 
 function printInventory(inputs) {
     let message = printHeader();
@@ -50,9 +59,14 @@ function printInventory(inputs) {
     });
 
     message += printLineBreak();
-    message += printPromotion();
+    message += printPromotionHeader();
+    _.forIn(itemsInCart, function (item) {
+        if (item.promotedCount) {
+            message += printPromotionItem(item);
+        }
+    });
     message += printLineBreak();
-    message += printTotal();
+    message += printTotal(calculateTotal(itemsInCart));
 
     console.log(message);
     return message;

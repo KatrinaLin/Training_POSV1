@@ -18,6 +18,10 @@
   },
   "homepage": "https://school.thoughtworks.cn",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "jasmine": "^2.6.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10"
   }
 }
